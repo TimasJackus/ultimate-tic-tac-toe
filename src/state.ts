@@ -241,7 +241,7 @@ class State {
                     }
                 }
             }
-            
+
             if (i % every === 0 && i !== 0) {
                 console.log(`Rounds: ${i}`);
                 let { ties, playerOneWins, playerTwoWins } = this;
@@ -256,8 +256,8 @@ class State {
                 this.ties = 0;
                 this.playerOneWins = 0;
                 this.playerTwoWins = 0;
-                this.playerOne.savePolicy(i);
-                this.playerTwo.savePolicy(i);
+                await this.playerOne.savePolicy(i);
+                await this.playerTwo.savePolicy(i);
             }
         }
     }
