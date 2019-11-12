@@ -5,7 +5,7 @@ import HumanPlayer from './humanPlayer';
 
 class State {
     board: NdArray<number[][]>;
-    playerOne: Player | HumanPlayer;
+    playerOne: Player;
     playerTwo: Player | HumanPlayer;
     isEnd: boolean;
     boardHash: string;
@@ -241,7 +241,7 @@ class State {
                     }
                 }
             }
-            const every = 100;
+            const every = 5000;
             if (i % every === 0 && i !== 0) {
                 console.log(`Rounds: ${i}`);
                 let { ties, playerOneWins, playerTwoWins } = this;
@@ -256,6 +256,8 @@ class State {
                 this.ties = 0;
                 this.playerOneWins = 0;
                 this.playerTwoWins = 0;
+                this.playerOne.savePolicy(i);
+                this.playerTwo.savePolicy(i);
             }
         }
     }

@@ -71,6 +71,7 @@ class HumanPlayer {
     addState(state) { }
     feedReward(reward) { }
     reset() { }
+    savePolicy() { }
 };
 
 export default HumanPlayer;

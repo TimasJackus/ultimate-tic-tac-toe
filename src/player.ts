@@ -59,11 +59,11 @@ class Player {
         this.states = [];
     }
 
-    savePolicy() {
-        fs.writeFile(`data/${this.name}`, JSON.stringify(this.statesValue), (err) => {
-            if (err) console.log(err);
-            console.log("Successfully Written to File.");
-        });
+    savePolicy(lastRound?: number) {
+        if (lastRound) {
+            fs.writeFileSync(`data/log`, 'last round: ' + JSON.stringify(lastRound));
+        }
+        fs.writeFileSync(`data/${this.name}`, JSON.stringify(this.statesValue));
     }
 
     loadPolicy() {
