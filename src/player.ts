@@ -67,7 +67,7 @@ class Player {
             await db.ref(`logs/${this.name}`).set(`lastRound: ${lastRound}`);
             // fs.writeFileSync(`data/log`, 'last round: ' + JSON.stringify(lastRound));
         }
-        console.log('savePolicy');
+        console.log('savePolicy', this.name);
         // fs.writeFileSync(`data/${this.name}`, JSON.stringify(this.statesValue));
     }
 
