@@ -1,6 +1,7 @@
 import { array } from "numjs";
 import * as fs from 'fs';
 import { db } from './db/db'
+import { changes } from "./helpers";
 
 class Player {
     name: string;
@@ -9,6 +10,7 @@ class Player {
     learningRate: number = 0.5;
     decayGamma: number = 0.9;
     statesValue = {};
+    oldObj = {};
 
     constructor(name: string, expRate: number = 0.25) {
         this.name = name;
@@ -62,14 +64,30 @@ class Player {
 
     async savePolicy(lastRound?: number) {
         return new Promise(async resolve => {
-            let promises = [];
-            db.ref(`${this.name}`).set(this.statesValue).then(() => {
-                if (lastRound) {
-                    db.ref(`logs/${this.name}`).set(`lastRound: ${lastRound}`).then(() => {
-                        resolve(true);
+            db.ref(this.name).once('value').then(snap => {
+                // If exists
+                if(snap.val()) {
+                    db.ref(`${this.name}`).update(changes(snap.val(), this.statesValue)).then(() => {
+                        this.oldObj = this.statesValue;
+                        if (lastRound) {
+                            db.ref(`logs/${this.name}`).set(`lastRound: ${lastRound}`).then(() => {
+                                resolve(true);
+                            });
+                        } else {
+                            resolve(true);
+                        }
                     });
                 } else {
-                    resolve(true);
+                    db.ref(`${this.name}`).set(this.statesValue).then(() => {
+                        this.oldObj = this.statesValue;
+                        if (lastRound) {
+                            db.ref(`logs/${this.name}`).set(`lastRound: ${lastRound}`).then(() => {
+                                resolve(true);
+                            });
+                        } else {
+                            resolve(true);
+                        }
+                    });
                 }
             });
         });
@@ -78,7 +96,8 @@ class Player {
     loadPolicy() {
         return db.ref(this.name).once('value').then(snap => {
             this.statesValue = snap.val();
-            console.log('loaded');
+            this.oldObj = snap.val();
+            // console.log('loaded');
             return true;
         });
         // return new Promise(resolve => {
