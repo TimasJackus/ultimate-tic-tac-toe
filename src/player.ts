@@ -1,5 +1,4 @@
 import { array } from "numjs";
-import * as fs from 'fs';
 import { db } from './db/db'
 import { changes } from "./helpers";
 
@@ -97,20 +96,8 @@ class Player {
         return db.ref(this.name).once('value').then(snap => {
             this.statesValue = snap.val();
             this.oldObj = snap.val();
-            // console.log('loaded');
             return true;
         });
-        // return new Promise(resolve => {
-        //     let buff = '';
-        //     let stream = fs.createReadStream(`data/${this.name}`);
-
-        //     stream.on('data', _buff => { buff += _buff });
-        //     stream.on('end', () => {
-        //         this.statesValue = JSON.parse(buff.toString());
-        //         console.log('loaded');
-        //         resolve(true);
-        //     });
-        // });
     }
 }
 
