@@ -65,6 +65,9 @@ class Player {
         return new Promise(async resolve => {
             db.ref(this.name).once('value').then(snap => {
                 // If exists
+                if (lastRound % 2000 === 0) {
+                    console.log('Keys count: ', Object.keys(snap.val()).length);
+                }
                 if(snap.val()) {
                     db.ref(`${this.name}`).update(changes(snap.val(), this.statesValue)).then(() => {
                         this.oldObj = this.statesValue;

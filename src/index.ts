@@ -12,7 +12,9 @@ const train = (current: number, max: number) => {
     if (current < max) {
         game.play(games, 1000);
         Promise.all([p1.savePolicy(games * (current + 1)), p2.savePolicy(games * (current + 1))]).then(() => {
-            console.log('Epoch ', current, 'saved.');
+            if ((current + 1) % 5 === 0) {
+                console.log(`Epoch ${current + 1} (rounds: ${(current + 1) * games}) saved.`);
+            }
             current++;
             train(current, max);
         });
