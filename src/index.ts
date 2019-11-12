@@ -1,6 +1,6 @@
 import State from "./state";
 import Player from "./player";
-// import HumanPlayer from "./humanPlayer";
+import HumanPlayer from "./humanPlayer";
 
 const p1: Player = new Player("vmOne");
 const p2: Player = new Player("vmTwo");
@@ -26,7 +26,7 @@ Promise.all([p1.loadPolicy(), p2.loadPolicy()]).then(res => {
     train(0, 10000);
 });
 
-// const computer: Player = new Player("computer_vm", 0);
+// const computer: Player = new Player("vmTwo", 0);
 // computer.loadPolicy().then(res => {
 //     console.log('loaded');
 //     const newGame = new State(computer, new HumanPlayer("Timas"));

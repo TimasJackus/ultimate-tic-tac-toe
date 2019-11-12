@@ -6,12 +6,12 @@ class Player {
     name: string;
     expRate: number;
     states: Array<string> = [];
-    learningRate: number = 0.5;
+    learningRate: number = 0.25;
     decayGamma: number = 0.9;
     statesValue = {};
     oldObj = {};
 
-    constructor(name: string, expRate: number = 0.25) {
+    constructor(name: string, expRate: number = 0.05) {
         this.name = name;
         this.expRate = expRate;
     }
@@ -98,6 +98,7 @@ class Player {
     loadPolicy() {
         return db.ref(this.name).once('value').then(snap => {
             this.statesValue = snap.val();
+            console.log(Object.keys(this.statesValue).length);
             this.oldObj = snap.val();
             return true;
         });

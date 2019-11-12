@@ -183,16 +183,16 @@ class State {
             case 1:
                 this.playerOneWins += 1;
                 this.playerOne.feedReward(1)
-                this.playerTwo.feedReward(0);
+                this.playerTwo.feedReward(-1);
                 break;
             case -1:
                 this.playerTwoWins += 1;
-                this.playerOne.feedReward(0)
+                this.playerOne.feedReward(-1)
                 this.playerTwo.feedReward(1);
                 break;
             default:
                 this.ties += 1;
-                this.playerOne.feedReward(0.1);
+                this.playerOne.feedReward(0.5);
                 this.playerTwo.feedReward(0.5);
                 break;
         }
