@@ -7,12 +7,12 @@ import { db } from "./db/db";
 const p1: Player = new Player("vmOne");
 const p2: Player = new Player("vmTwo");
 
-const games = 1000;
+const games = 400;
 const game = new State(p1, p2);
 
 const train = (current: number, max: number) => {
     if (current < max) {
-        game.play(games, 500);
+        game.play(games, 200);
         Promise.all([p1.savePolicy(games * (current + 1)), p2.savePolicy(games * (current + 1))]).then(() => {
             console.log('Epoch ', current, 'saved.');
             current++;
