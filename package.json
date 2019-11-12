@@ -6,7 +6,9 @@
   "dependencies": {
     "@types/express": "^4.17.1",
     "@types/numjs": "^0.14.4",
+    "async-exit-hook": "^2.0.1",
     "body-parser": "^1.19.0",
+    "death": "^1.1.0",
     "del": "^5.1.0",
     "esm": "^3.2.25",
     "express": "^4.17.1",

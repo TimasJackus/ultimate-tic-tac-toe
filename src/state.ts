@@ -256,8 +256,6 @@ class State {
                 this.ties = 0;
                 this.playerOneWins = 0;
                 this.playerTwoWins = 0;
-                await this.playerOne.savePolicy(i);
-                await this.playerTwo.savePolicy(i);
             }
         }
     }

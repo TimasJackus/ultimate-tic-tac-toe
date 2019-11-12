@@ -61,14 +61,15 @@ class Player {
     }
 
     async savePolicy(lastRound?: number) {
-        await db.ref(`agents/${this.name}`).set(this.statesValue);
+        return new Promise(async resolve => {
+            await db.ref(`agents/${this.name}`).set(this.statesValue).catch(err => console.log(err));
 
-        if (lastRound) {
-            await db.ref(`logs/${this.name}`).set(`lastRound: ${lastRound}`);
-            // fs.writeFileSync(`data/log`, 'last round: ' + JSON.stringify(lastRound));
-        }
-        console.log('savePolicy', this.name);
-        // fs.writeFileSync(`data/${this.name}`, JSON.stringify(this.statesValue));
+            if (lastRound) {
+                await db.ref(`logs/${this.name}`).set(`lastRound: ${lastRound}`).catch(err => console.log(err));
+                // fs.writeFileSync(`data/log`, 'last round: ' + JSON.stringify(lastRound));
+            }
+            resolve(true);
+        });
     }
 
     loadPolicy() {
