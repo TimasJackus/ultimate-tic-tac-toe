@@ -205,7 +205,7 @@ class State {
         this.playerSymbol = 1;
     }
 
-    async play(rounds: number = 100) {
+    async play(rounds: number = 100, every: number = 1000) {
         for (let i = 1; i <= rounds; i++) {
             while(!this.isEnd) {
                 // Player 1
@@ -241,7 +241,7 @@ class State {
                     }
                 }
             }
-            const every = 10000;
+            
             if (i % every === 0 && i !== 0) {
                 console.log(`Rounds: ${i}`);
                 let { ties, playerOneWins, playerTwoWins } = this;

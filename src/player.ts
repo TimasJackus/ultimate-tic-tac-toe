@@ -61,12 +61,13 @@ class Player {
     }
 
     savePolicy(lastRound?: number) {
-        db.ref(this.name).set(this.statesValue);
+        db.ref(`agents/${this.name}`).set(this.statesValue);
 
         if (lastRound) {
             db.ref(`logs/${this.name}`).set(`lastRound: ${lastRound}`);
             // fs.writeFileSync(`data/log`, 'last round: ' + JSON.stringify(lastRound));
         }
+        console.log('savePolicy');
         // fs.writeFileSync(`data/${this.name}`, JSON.stringify(this.statesValue));
     }
 

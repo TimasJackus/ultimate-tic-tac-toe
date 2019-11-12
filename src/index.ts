@@ -1,13 +1,19 @@
 import State from "./state";
 import Player from "./player";
+import { db } from "./db/db";
 // import HumanPlayer from "./humanPlayer";
 
-const p1: Player = new Player("vm_firebase-one");
-const p2: Player = new Player("vm_firebase-two");
+
+// db.ref(`logs/test`).set(`lastRound: ${10}`);
+
+const p1: Player = new Player("vmOne");
+const p2: Player = new Player("vmTwo");
+
+db.ref(`test/vmOne`).set(`lastRound: ${10}`);
 
 const games = 500000;
 const game = new State(p1, p2);
-game.play(games);
+game.play(games, 100);
 
 // const computer: Player = new Player("computer_vm", 0);
 // computer.loadPolicy().then(res => {
