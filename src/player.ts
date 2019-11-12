@@ -1,5 +1,6 @@
 import { array } from "numjs";
 import * as fs from 'fs';
+import { db } from './db/db'
 
 class Player {
     name: string;
@@ -60,24 +61,32 @@ class Player {
     }
 
     savePolicy(lastRound?: number) {
+        db.ref(this.name).set(this.statesValue);
+
         if (lastRound) {
-            fs.writeFileSync(`data/log`, 'last round: ' + JSON.stringify(lastRound));
+            db.ref(`logs/${this.name}`).set(`lastRound: ${lastRound}`);
+            // fs.writeFileSync(`data/log`, 'last round: ' + JSON.stringify(lastRound));
         }
-        fs.writeFileSync(`data/${this.name}`, JSON.stringify(this.statesValue));
+        // fs.writeFileSync(`data/${this.name}`, JSON.stringify(this.statesValue));
     }
 
     loadPolicy() {
-        return new Promise(resolve => {
-            let buff = '';
-            let stream = fs.createReadStream(`data/${this.name}`);
-
-            stream.on('data', _buff => { buff += _buff });
-            stream.on('end', () => {
-                this.statesValue = JSON.parse(buff.toString());
-                console.log('loaded');
-                resolve(true);
-            });
+        return db.ref(this.name).once('value').then(snap => {
+            this.statesValue = snap.val();
+            console.log('loaded');
+            return true;
         });
+        // return new Promise(resolve => {
+        //     let buff = '';
+        //     let stream = fs.createReadStream(`data/${this.name}`);
+
+        //     stream.on('data', _buff => { buff += _buff });
+        //     stream.on('end', () => {
+        //         this.statesValue = JSON.parse(buff.toString());
+        //         console.log('loaded');
+        //         resolve(true);
+        //     });
+        // });
     }
 }
 

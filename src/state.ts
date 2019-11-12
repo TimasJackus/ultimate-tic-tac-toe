@@ -1,7 +1,7 @@
-import { zeros, NdArray, sum, array } from 'numjs';
+import { zeros, NdArray } from 'numjs';
 import Player from './player';
 import HumanPlayer from './humanPlayer';
-// const {printTable} = require('console-table-printer');
+import { sha1 } from 'hash.js';
 
 class State {
     board: NdArray<number[][]>;
@@ -14,6 +14,7 @@ class State {
     ties: number = 0;
     playerOneWins: number = 0;
     playerTwoWins: number = 0;
+    
 
     constructor(playerOne: Player, playerTwo: Player | HumanPlayer) {
         this.board = zeros<any>([9, 3, 3]);
@@ -26,7 +27,7 @@ class State {
 
     getHash(): string {
         this.boardHash = JSON.stringify(this.board.reshape(9 * 3 * 3));
-        return this.boardHash;
+        return sha1().update(this.boardHash).digest('hex');
     }
 
     tileWinner(tileIndex): number {
@@ -174,7 +175,6 @@ class State {
         this.board.set(...position, this.playerSymbol);
         this.playerSymbol = this.playerSymbol === 1 ? -1 : 1;
         this.activeTile = position[1] * 3 + position[2];
-        // console.log(position, this.activeTile);
     }
 
     giveReward() {
@@ -205,12 +205,12 @@ class State {
         this.playerSymbol = 1;
     }
 
-    play(rounds: number = 100) {
-        for (let i = 0; i < rounds; i++) {
+    async play(rounds: number = 100) {
+        for (let i = 1; i <= rounds; i++) {
             while(!this.isEnd) {
                 // Player 1
                 const positions = this.availablePositions();
-                const playerOneAction = this.playerOne.chooseAction(positions, this.board.tolist(), this.playerSymbol);
+                const playerOneAction = await this.playerOne.chooseAction(positions, this.board.tolist(), this.playerSymbol);
                 this.updateState(playerOneAction);
                 const boardHash = this.getHash();
                 this.playerOne.addState(boardHash);
@@ -225,7 +225,7 @@ class State {
                     break;
                 } else {
                     const positions = this.availablePositions();
-                    const playerTwoAction = this.playerTwo.chooseAction(positions, this.board.tolist(), this.playerSymbol);
+                    const playerTwoAction = await this.playerTwo.chooseAction(positions, this.board.tolist(), this.playerSymbol);
                     this.updateState(playerTwoAction);
                     const boardHash = this.getHash();
                     this.playerTwo.addState(boardHash);
@@ -241,7 +241,7 @@ class State {
                     }
                 }
             }
-            const every = 5000;
+            const every = 10000;
             if (i % every === 0 && i !== 0) {
                 console.log(`Rounds: ${i}`);
                 let { ties, playerOneWins, playerTwoWins } = this;
@@ -265,7 +265,7 @@ class State {
     async playVsAI() {
         while (!this.isEnd) {
             const positions = this.availablePositions();
-            const playerOneAction = this.playerOne.chooseAction(positions, this.board.tolist(), this.playerSymbol);
+            const playerOneAction = await this.playerOne.chooseAction(positions, this.board.tolist(), this.playerSymbol);
             this.updateState(playerOneAction);
             this.showBoard();
 
