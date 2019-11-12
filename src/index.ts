@@ -6,7 +6,7 @@ const p1: Player = new Player("computer");
 const p2: Player = new Player("computer2");
 
 const game = new State(p1, p2);
-game.play(1000);
+game.play(10000);
 
 // p1.savePolicy();
 
