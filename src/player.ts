@@ -1,24 +1,24 @@
 import { array } from "numjs";
 import { db } from './db/db'
 import { changes } from "./helpers";
+import { sha1 } from 'hash.js';
 
 class Player {
     name: string;
     expRate: number;
     states: Array<string> = [];
-    learningRate: number = 0.25;
-    decayGamma: number = 0.9;
+    learningRate: number = 0.05;
+    decayGamma: number = 1;
     statesValue = {};
-    oldObj = {};
 
-    constructor(name: string, expRate: number = 0.05) {
+    constructor(name: string, expRate: number = 0.3) {
         this.name = name;
         this.expRate = expRate;
     }
 
     getHash(board): string {
         board = JSON.stringify(board.reshape(9 * 3 * 3));
-        return board;
+        return sha1().update(board).digest('hex');
     }
 
     chooseAction(positions, currentBoard, symbol) {
@@ -70,7 +70,6 @@ class Player {
                 }
                 if(snap.val()) {
                     db.ref(`${this.name}`).update(changes(snap.val(), this.statesValue)).then(() => {
-                        this.oldObj = this.statesValue;
                         if (lastRound) {
                             db.ref(`logs/${this.name}`).set(`lastRound: ${lastRound}`).then(() => {
                                 resolve(true);
@@ -81,7 +80,6 @@ class Player {
                     });
                 } else {
                     db.ref(`${this.name}`).set(this.statesValue).then(() => {
-                        this.oldObj = this.statesValue;
                         if (lastRound) {
                             db.ref(`logs/${this.name}`).set(`lastRound: ${lastRound}`).then(() => {
                                 resolve(true);
@@ -97,11 +95,10 @@ class Player {
 
     loadPolicy() {
         return db.ref(this.name).once('value').then(snap => {
-            this.statesValue = snap.val();
+            this.statesValue = snap.val() ? snap.val() : {};
             console.log(Object.keys(this.statesValue).length);
-            this.oldObj = snap.val();
             return true;
-        });
+        }).catch(err => console.log(err));
     }
 }
 
