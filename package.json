@@ -18,6 +18,7 @@
     "gulp": "4.0.0",
     "gulp-typescript": "^5.0.1",
     "hash.js": "^1.1.7",
+    "mcts": "^0.0.8",
     "nodemon": "^1.19.3",
     "numjs": "^0.16.0",
     "readline": "^1.3.0",

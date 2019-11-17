@@ -1,14 +1,12 @@
 import { array } from "numjs";
-import { db } from './db/db'
-import { changes } from "./helpers";
-import { sha1 } from 'hash.js';
+import * as fs from 'fs';
 
 class Player {
     name: string;
     expRate: number;
     states: Array<string> = [];
-    learningRate: number = 0.05;
-    decayGamma: number = 1;
+    learningRate: number = 0.5;
+    decayGamma: number = 0.9;
     statesValue = {};
 
     constructor(name: string, expRate: number = 0.3) {
@@ -16,9 +14,9 @@ class Player {
         this.expRate = expRate;
     }
 
-    getHash(board): string {
-        board = JSON.stringify(board.reshape(9 * 3 * 3));
-        return sha1().update(board).digest('hex');
+    getHash(board, print = false): string {
+        board = board.reshape(9 * 3 * 3).tolist().join('');
+        return board;
     }
 
     chooseAction(positions, currentBoard, symbol) {
@@ -48,7 +46,7 @@ class Player {
     }
 
     feedReward(reward: number): void {
-        this.states.reverse().map(state => {
+        this.states.map(state => {
             if (!this.statesValue[state]) {
                 this.statesValue[state] = 0;
             }
@@ -61,44 +59,22 @@ class Player {
         this.states = [];
     }
 
-    async savePolicy(lastRound?: number) {
-        return new Promise(async resolve => {
-            db.ref(this.name).once('value').then(snap => {
-                // If exists
-                if (lastRound % 2000 === 0) {
-                    console.log('Keys count: ', Object.keys(snap.val()).length);
-                }
-                if(snap.val()) {
-                    db.ref(`${this.name}`).update(changes(snap.val(), this.statesValue)).then(() => {
-                        if (lastRound) {
-                            db.ref(`logs/${this.name}`).set(`lastRound: ${lastRound}`).then(() => {
-                                resolve(true);
-                            });
-                        } else {
-                            resolve(true);
-                        }
-                    });
-                } else {
-                    db.ref(`${this.name}`).set(this.statesValue).then(() => {
-                        if (lastRound) {
-                            db.ref(`logs/${this.name}`).set(`lastRound: ${lastRound}`).then(() => {
-                                resolve(true);
-                            });
-                        } else {
-                            resolve(true);
-                        }
-                    });
-                }
-            });
-        });
+    savePolicy(lastRound?: number) {
+        fs.writeFileSync(`data/${this.name}`, JSON.stringify(this.statesValue));
+        // fs.writeFileSync(`data/${this.name}_log`, `saved rounds: ${lastRound}`);
     }
 
     loadPolicy() {
-        return db.ref(this.name).once('value').then(snap => {
-            this.statesValue = snap.val() ? snap.val() : {};
-            console.log(Object.keys(this.statesValue).length);
-            return true;
-        }).catch(err => console.log(err));
+        return new Promise(resolve => {
+            let buff = '';
+            let stream = fs.createReadStream(`data/${this.name}`);
+
+            stream.on('data', _buff => { buff += _buff });
+            stream.on('end', () => {
+                this.statesValue = JSON.parse(buff.toString());
+                resolve(true);
+            });
+        });
     }
 }
 

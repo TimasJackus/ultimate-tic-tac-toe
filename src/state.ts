@@ -1,7 +1,6 @@
 import { zeros, NdArray } from 'numjs';
 import Player from './player';
 import HumanPlayer from './humanPlayer';
-import { sha1 } from 'hash.js';
 
 class State {
     board: NdArray<number[][]>;
@@ -26,8 +25,8 @@ class State {
     }
 
     getHash(): string {
-        this.boardHash = JSON.stringify(this.board.reshape(9 * 3 * 3));
-        return sha1().update(this.boardHash).digest('hex');
+        this.boardHash = (this.board.reshape(9 * 3 * 3) as any).tolist().join('');
+        return this.boardHash;
     }
 
     tileWinner(tileIndex): number {
@@ -205,12 +204,12 @@ class State {
         this.playerSymbol = 1;
     }
 
-    async play(rounds: number = 100, every: number = 1000) {
+    play(rounds: number = 100, every: number = 1000) {
         for (let i = 1; i <= rounds; i++) {
             while(!this.isEnd) {
                 // Player 1
                 const positions = this.availablePositions();
-                const playerOneAction = await this.playerOne.chooseAction(positions, this.board.tolist(), this.playerSymbol);
+                const playerOneAction = this.playerOne.chooseAction(positions, this.board.tolist(), this.playerSymbol);
                 this.updateState(playerOneAction);
                 const boardHash = this.getHash();
                 this.playerOne.addState(boardHash);
@@ -225,7 +224,7 @@ class State {
                     break;
                 } else {
                     const positions = this.availablePositions();
-                    const playerTwoAction = await this.playerTwo.chooseAction(positions, this.board.tolist(), this.playerSymbol);
+                    const playerTwoAction = this.playerTwo.chooseAction(positions, this.board.tolist(), this.playerSymbol);
                     this.updateState(playerTwoAction);
                     const boardHash = this.getHash();
                     this.playerTwo.addState(boardHash);
@@ -340,32 +339,6 @@ class State {
         }
         return out;
     }
-
-    showTile(tileIndex) {
-        const tile = this.board.tolist()[tileIndex];
-        console.log('-------------')
-        for (let i = 0; i < 3; i++) {
-            let out = '| ';
-            for (let j = 0; j < 3; j++) {
-                let token;
-                switch(tile[i][j]) {
-                    case 1:
-                        token = 'x';
-                        break;
-                    case -1:
-                        token = 'o';
-                        break;
-                    default:
-                        token = ' ';
-                        break;
-                }
-                out += token + ' | ';
-            }
-            console.log(out);
-        }
-        console.log('-------------')
-    }
-
 }
 
 export default State;
