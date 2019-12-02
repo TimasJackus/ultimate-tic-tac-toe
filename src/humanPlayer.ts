@@ -75,3 +75,47 @@ class HumanPlayer {
 };
 
 export default HumanPlayer;
+
+
+
+export function chooseTileAction() {
+    return new Promise(resolve => {
+        rl.question('Input your action tile: ', (tile: number | string) => {
+            tile = Number(tile);
+            if (!isNaN(tile)) {
+                resolve(tile);
+                return tile;;
+            }
+            resolve(this.chooseTileAction());
+            return;
+        });
+    });
+}    
+
+export function chooseRowAction() {
+    return new Promise(resolve => {
+        rl.question('Input your action row: ', (row: number | string) => {
+            row = Number(row);
+            if (!isNaN(row)) {
+                resolve(row);
+                return row;;
+            }
+            resolve(this.chooseRowAction());
+            return;
+        });
+    });
+}
+
+export function chooseColAction() {
+    return new Promise(resolve => {
+        rl.question('Input your action col: ', (col: number | string) => {
+            col = Number(col);
+            if (!isNaN(col)) {
+                resolve(col);
+                return col;
+            }
+            resolve(this.chooseColAction());
+            return;
+        });
+    });
+}
