@@ -51,7 +51,6 @@ class Game {
                 }
             }
         });
-        // console.log(positions.length);
         return positions;
     }
 
@@ -114,12 +113,10 @@ class Game {
             const tile3 = state.board[i * 3 + 2]; 
             const rowSum = this.tileWinner(tile1) + this.tileWinner(tile2) + this.tileWinner(tile3);
             if (rowSum === 3) {
-                console.log({ possibleMoves: this.getPossibleMoves(state )});
                 this.isEnd = true;
                 return 1;
             }
             if (rowSum === -3) {
-                console.log({ possibleMoves: this.getPossibleMoves(state )});
                 this.isEnd = true;
                 return -1;
             }
@@ -132,12 +129,10 @@ class Game {
             const tile3 = state.board[i + 6]; 
             const colSum =  this.tileWinner(tile1) + this.tileWinner(tile2) + this.tileWinner(tile3);
             if (colSum === 3) {
-                console.log({ possibleMoves: this.getPossibleMoves(state )});
                 this.isEnd = true;
                 return 1;
             }
             if (colSum === -3) {
-                console.log({ possibleMoves: this.getPossibleMoves(state )});
                 this.isEnd = true;
                 return -1;
             }
@@ -147,19 +142,16 @@ class Game {
         const diag_sum1 = this.tileWinner(state.board[0]) + this.tileWinner(state.board[4]) + this.tileWinner(state.board[8]);
         const diag_sum2 = this.tileWinner(state.board[2]) + this.tileWinner(state.board[4]) + this.tileWinner(state.board[6]);
         if (diag_sum1 === 3 || diag_sum2 === 3) {
-            console.log({ possibleMoves: this.getPossibleMoves(state )});
             this.isEnd = true;
             return 1;
         }
         if (diag_sum1 === -3 || diag_sum2 === -3) {
-            console.log({ possibleMoves: this.getPossibleMoves(state )});
             this.isEnd = true;
             return -1;
         }
 
         // tie
         if (this.getPossibleMoves(state).length === 0) {
-            console.log({ possibleMoves: this.getPossibleMoves(state )});
             this.isEnd = true;
             return 0;
         }
@@ -278,7 +270,6 @@ class Game {
         const diag1_filled = tile[0][0] !== 0 && tile[1][1] !== 0 && tile[2][2] !== 0;
         const diag2_filled = tile[0][2] !== 0 && tile[1][1] !== 0 && tile[2][0] !== 0;
 
-        // console.log({winnerCounts, tile, i});
         if (!diag1_filled) {
             if (diag_sum1 > 1) {
                 winnerCounts['X'] += 1;
