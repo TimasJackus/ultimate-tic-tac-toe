@@ -1,7 +1,5 @@
 import State from "./state";
-import { zeros, array, diag } from "numjs";
-import { showBoard } from ".";
-import { stat } from "fs";
+import { zeros, array } from "numjs";
 
 class Game {
     isEnd = false;
@@ -116,10 +114,12 @@ class Game {
             const tile3 = state.board[i * 3 + 2]; 
             const rowSum = this.tileWinner(tile1) + this.tileWinner(tile2) + this.tileWinner(tile3);
             if (rowSum === 3) {
+                console.log({ possibleMoves: this.getPossibleMoves(state )});
                 this.isEnd = true;
                 return 1;
             }
             if (rowSum === -3) {
+                console.log({ possibleMoves: this.getPossibleMoves(state )});
                 this.isEnd = true;
                 return -1;
             }
@@ -132,10 +132,12 @@ class Game {
             const tile3 = state.board[i + 6]; 
             const colSum =  this.tileWinner(tile1) + this.tileWinner(tile2) + this.tileWinner(tile3);
             if (colSum === 3) {
+                console.log({ possibleMoves: this.getPossibleMoves(state )});
                 this.isEnd = true;
                 return 1;
             }
             if (colSum === -3) {
+                console.log({ possibleMoves: this.getPossibleMoves(state )});
                 this.isEnd = true;
                 return -1;
             }
@@ -145,16 +147,19 @@ class Game {
         const diag_sum1 = this.tileWinner(state.board[0]) + this.tileWinner(state.board[4]) + this.tileWinner(state.board[8]);
         const diag_sum2 = this.tileWinner(state.board[2]) + this.tileWinner(state.board[4]) + this.tileWinner(state.board[6]);
         if (diag_sum1 === 3 || diag_sum2 === 3) {
+            console.log({ possibleMoves: this.getPossibleMoves(state )});
             this.isEnd = true;
             return 1;
         }
         if (diag_sum1 === -3 || diag_sum2 === -3) {
+            console.log({ possibleMoves: this.getPossibleMoves(state )});
             this.isEnd = true;
             return -1;
         }
 
         // tie
         if (this.getPossibleMoves(state).length === 0) {
+            console.log({ possibleMoves: this.getPossibleMoves(state )});
             this.isEnd = true;
             return 0;
         }
@@ -164,7 +169,6 @@ class Game {
     }
 
     calculateBigBoardScore(state) {
-        let score = 0;
         let winnerCounts = {
             'X': 0,
             'O': 0
@@ -177,19 +181,12 @@ class Game {
             const tile3 = this.tileWinner(state.board[i * 3 + 2]); 
             const rowSum = tile1 + tile2 + tile3;
             const rowFilled = tile1 !== 0 && tile2 !== 0 && tile3 !== 0;
-            if (rowFilled) {
-                if (rowSum === 3) {
-                    winnerCounts['X'] += rowSum;
+            if (!rowFilled) {
+                if (rowSum > 1) {
+                    winnerCounts['X'] += 1;
                 }
-                if (rowSum === -3) {
-                    winnerCounts['O'] -= rowSum;
-                }
-            } else {
-                if (rowSum > 0) {
-                    winnerCounts['X'] += rowSum;
-                }
-                if (rowSum < 0) {
-                    winnerCounts['O'] -= rowSum
+                if (rowSum < -1) {
+                    winnerCounts['O'] += 1;
                 }
             }
         }
@@ -201,19 +198,12 @@ class Game {
             const tile3 = this.tileWinner(state.board[i + 6]); 
             const colSum = tile1 + tile2 + tile3;
             const colFilled = tile1 !== 0 && tile2 !== 0 && tile3 !== 0;
-            if (colFilled) {
-                if (colSum === 3) {
-                    winnerCounts['X'] += colSum;
+            if (!colFilled) {
+                if (colSum > 1) {
+                    winnerCounts['X'] += 1;
                 }
-                if (colSum === -3) {
-                    winnerCounts['O'] -= colSum;
-                }
-            } else {
-                if (colSum > 0) {
-                    winnerCounts['X'] += colSum;
-                }
-                if (colSum < 0) {
-                    winnerCounts['O'] -= colSum;
+                if (colSum < -1) {
+                    winnerCounts['O'] += 1;
                 }
             }
         }
@@ -229,51 +219,26 @@ class Game {
         const diag1_filled = tile0 !== 0 && tile4 !== 0 && tile8 !== 0;
         const diag2_filled = tile2 !== 0 && tile4 !== 0 && tile6 !== 0;
 
-        if (diag1_filled) {
-            if (diag_sum1 === 3) {
-                winnerCounts['X'] += diag_sum1;
+        if (!diag1_filled) {
+            if (diag_sum1 > 1) {
+                winnerCounts['X'] += 1;
             }
-            if (diag_sum1 === -3) {
-                winnerCounts['O'] -= diag_sum1;
-            }
-        } else {
-            if (diag_sum1 > 0) {
-                winnerCounts['X'] += diag_sum1;
-            }
-            if (diag_sum1 < 0) {
-                winnerCounts['O'] -= diag_sum1
+            if (diag_sum1 < -1) {
+                winnerCounts['O'] += 1;
             }
         }
-        if (diag2_filled) {
-            if (diag_sum2 === 3) {
-                winnerCounts['X'] += diag_sum2;
+        if (!diag2_filled) {
+            if (diag_sum2 > 1) {
+                winnerCounts['X'] += 1;
             }
-            if (diag_sum2 === -3) {
-                winnerCounts['O'] -= diag_sum2;
-            }
-        } else {
-            if (diag_sum2 > 0) {
-                winnerCounts['X'] += diag_sum2;
-            }
-            if (diag_sum2 < 0) {
-                winnerCounts['O'] -= diag_sum2;
+            if (diag_sum2 < -1) {
+                winnerCounts['O'] += 1;
             }
         }
-
-        if (winnerCounts['O'] > 0 && winnerCounts['X'] > 0) {
-            score = 0;
-        } else if (winnerCounts['X'] > 0) {
-            score += Math.pow(10, winnerCounts['X'] + 1);
-        } else if (winnerCounts['O'] > 0) {
-            score -= Math.pow(10, winnerCounts['O'] + 1);
-        }
-
-        // score += Math.pow(10, winnerCounts['X'] - winnerCounts['O']);
-        return score;
+        return winnerCounts['X'] - winnerCounts['O'];
     }
 
-    calculateSmallBoardScore(state, tile, print = false) {
-        let score = 0;
+    calculateSmallBoardScore(tile) {
         let winnerCounts = {
             'X': 0,
             'O': 0
@@ -284,18 +249,11 @@ class Game {
             const rowSum = tile[i][0] + tile[i][1] + tile[i][2];
             const rowFilled = tile[i][0] !== 0 && tile[i][1] !== 0 && tile[i][2] !== 0;
             if (rowFilled) {
-                if (rowSum === 3) {
-                    winnerCounts['X'] += rowSum;
-                }
-                if (rowSum === -3) {
-                    winnerCounts['O'] -= rowSum;
-                }
-            } else {
                 if (rowSum > 1) {
-                    winnerCounts['X'] += rowSum;
+                    winnerCounts['X'] += 1;
                 }
                 if (rowSum < -1) {
-                    winnerCounts['O'] -= rowSum
+                    winnerCounts['O'] += 1
                 }
             }
         }
@@ -304,19 +262,12 @@ class Game {
         for (let i = 0; i < 3; i++) {
             const colSum =  tile[0][i] + tile[1][i] + tile[2][i];
             const colFilled = tile[0][i] !== 0 && tile[1][i] !== 0 && tile[2][i] !== 0;
-            if (colFilled) {
-                if (colSum === 3) {
-                    winnerCounts['X'] += colSum;
-                }
-                if (colSum === -3) {
-                    winnerCounts['O'] -= colSum;
-                }
-            } else {
+            if (!colFilled) {
                 if (colSum > 1) {
-                    winnerCounts['X'] += colSum;
+                    winnerCounts['X'] += 1;
                 }
                 if (colSum < -1) {
-                    winnerCounts['O'] -= colSum
+                    winnerCounts['O'] += 1
                 }
             }
         }
@@ -327,51 +278,24 @@ class Game {
         const diag1_filled = tile[0][0] !== 0 && tile[1][1] !== 0 && tile[2][2] !== 0;
         const diag2_filled = tile[0][2] !== 0 && tile[1][1] !== 0 && tile[2][0] !== 0;
 
-
-        if (diag1_filled) {
-            if (diag_sum1 === 3) {
-                winnerCounts['X'] += diag_sum1;
-            }
-            if (diag_sum1 === -3) {
-                winnerCounts['O'] -= diag_sum1;
-            }
-        } else {
+        // console.log({winnerCounts, tile, i});
+        if (!diag1_filled) {
             if (diag_sum1 > 1) {
-                winnerCounts['X'] += diag_sum1;
+                winnerCounts['X'] += 1;
             }
             if (diag_sum1 < -1) {
-                winnerCounts['O'] -= diag_sum1
+                winnerCounts['O'] += 1
             }
         }
-        if (diag2_filled) {
-            if (diag_sum2 === 3) {
-                winnerCounts['X'] += diag_sum2;
-            }
-            if (diag_sum2 === -3) {
-                winnerCounts['O'] -= diag_sum2;
-            }
-        } else {
+        if (!diag2_filled) {
             if (diag_sum2 > 1) {
-                winnerCounts['X'] += diag_sum2;
+                winnerCounts['X'] += 1;
             }
             if (diag_sum2 < -1) {
-                winnerCounts['O'] -= diag_sum2;
+                winnerCounts['O'] += 1;
             }
         }
-
-        if (winnerCounts['O'] > 0 && winnerCounts['X'] > 0) {
-            score = 0;
-        } else if (winnerCounts['X'] > 0) {
-            score += Math.pow(10, winnerCounts['X'] - 1);
-        } else if (winnerCounts['O'] > 0) {
-            score -= Math.pow(10, winnerCounts['O'] - 1);
-        }
-        
-        // const difference = winnerCounts['X'] - winnerCounts['O'];
-        // const multiplier = difference < 0 ? -1 : 1;
-        // if (print) console.log({ winnerCounts, difference, multiplier, score, tile });
-
-        return score;
+        return winnerCounts['X'] - winnerCounts['O'];
     }
 
     getScore(state): number {
@@ -380,9 +304,10 @@ class Game {
         for (let i = 0; i < 9; i++) {
             let winner = this.tileWinner(state.board[i]);
             if (winner !== null) {
-                score += Math.pow(10, 4) * winner;
+                score += Math.pow(10, 5) * winner;
             } else {
-                score += this.calculateSmallBoardScore(state, state.board[i]);
+                score += Math.pow(10, 3) * this.calculateSmallBoardScore(state.board[i]);
+                score += Math.pow(10, 4) * this.calculateBigBoardScore(state);
             }
         }
         return score;

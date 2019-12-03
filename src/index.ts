@@ -3,7 +3,6 @@ import { chooseTileAction, chooseRowAction, chooseColAction } from './humanPlaye
 import { Minimax } from './minimax';
 
 export const getString = (tile, row) => {
-    // const tile = this.board.tolist()[tileIndex];
     let out = '| ';
     for (let j = 0; j < 3; j++) {
         let token;
@@ -61,23 +60,15 @@ async function getPlayerMove(positions) {
 
  async function init() {
     let game = new Game();
-    // let mcts = new MCTS(game)
     let minimax = new Minimax(game);
     
-    let state = game.start()
-    let winner = game.winner(state)
-    // mcts.runSearch(state, 10);
-    
-    // console.log();
-    
+    let state = game.start();
+    let winner = game.winner(state);
     while (winner === null) {
-        // const move = mcts.bestMove(state);
         const move = minimax.findBestMove(state);
         state = game.updateState(state, move);
         showBoard(state.board);
         winner = game.winner(state);
-        const smallboardScore = game.calculateSmallBoardScore(state, state.board[4], true);
-        console.log({ smallboardScore });
         if (winner === null) {
             const playerMove = await getPlayerMove(game.getPossibleMoves(state));
             state = game.updateState(state, playerMove);
@@ -93,26 +84,3 @@ async function getPlayerMove(positions) {
 }
 
 init();
-// From initial state, play games until end
-
-// while (winner === null) {
-
-//   console.log()
-//   console.log("player: " + (state.player === 1 ? 1 : 2))
-//   showBoard(state.board);
-//   console.log(state.board.map((row) => row.map((cell) => cell === -1 ? 2 : cell)))
-
-
-//   mcts.runSearch(state, 1)
-
-//   let stats = mcts.getStats(state)
-//   console.log(util.inspect(stats, {showHidden: false, depth: null}))
-
-//   let play = mcts.bestMove(state)
-//   console.log("chosen play: " + util.inspect(play, {showHidden: false, depth: null}))
-//   if (play) {
-//     state = game.updateState(state, play)
-//     winner = game.winner(state)
-//   }
-// }
-// showBoard(state.board);

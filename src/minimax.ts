@@ -8,46 +8,46 @@ export class Minimax {
         this.game = game;
     }
 
-    private minimax(state: State, depth: number, alpha: number = -Infinity, beta: number = Infinity): number {
+    private minimax(state: State, depth: number, alpha: number = -Infinity, beta: number = Infinity): any {
         const winner = this.game.winner(state);
         if (this.game.isEnd) {
             switch (winner) {
                 case 1:
                     this.game.isEnd = false;
-                    return Infinity;
+                    return { bestScore: Infinity };
                 case -1:
                     this.game.isEnd = false;
-                    return -Infinity;
+                    return { bestScore: -Infinity };
                 case 0:
                 default:
                     this.game.isEnd = false;
-                    return -Math.pow(10, depth);
+                    return { bestScore: 0 };
             }
         }
 
         if (depth <= 0) {
             const score = this.game.getScore(state);
-            return score;
+            return { bestScore: score };
         }
 
         const possibleMoves: number[][] = this.game.getPossibleMoves(state);
         let bestScore;
+        let bestMove = possibleMoves[0];
+        if (depth === 3) console.log(possibleMoves);
 
         if (state.player === 1) {
             bestScore = -Infinity;
             for (let i = 0; i < possibleMoves.length; i++) {
                 const move = possibleMoves[i];
-                if (!move) {
-                    console.log({ move, length: possibleMoves.length, i });
-                    break;
-                }
                 const newState = this.game.updateState(state, move);
-                const score = this.minimax(newState, depth - 1, alpha, beta);
-                // console.log({ score, depth: depth - 1, move });
-                // console.log(bestScore, score);
-                bestScore = Math.max(score, bestScore);
+                const minimax = this.minimax(newState, depth - 1, alpha, beta);
+                const score = minimax.bestScore;
+                if (score > bestScore) {
+                    bestMove = move;
+                    bestScore = score;
+                }
                 alpha = Math.max(bestScore, alpha);
-                if (beta <= alpha) {
+                if (alpha >= beta) {
                     break;
                 }
             }
@@ -55,45 +55,28 @@ export class Minimax {
             bestScore = Infinity;
             for (let i = 0; i < possibleMoves.length; i++) {
                 const move = possibleMoves[i];
-                if (!move) {
-                    console.log({ move, length: possibleMoves.length, i });
-                    break;
-                }
                 const newState = this.game.updateState(state, move);
-                const score = this.minimax(newState, depth - 1, alpha, beta);
-                bestScore = Math.min(score, bestScore);
+                const score = this.minimax(newState, depth - 1, alpha, beta).bestScore;
+                if (score < bestScore) {
+                    bestMove = move;
+                    bestScore = score;
+                }
                 beta = Math.min(bestScore, beta);
-                if (beta <= alpha) {
+                if (alpha >= beta) {
                     break;
                 }
             }
         }
 
-        return bestScore;
+        return { bestScore, bestMove };
     }
 
-    findBestMove(state: State, maxDepth = 5): number[] {
+    findBestMove(state: State, maxDepth = 3): number[] {
         const possibleMoves: number[][] = this.game.getPossibleMoves(state);
-        let bestValue = state.player === 1 ? -Infinity : Infinity;
-        let bestMove: number[] = possibleMoves[0]; 
-
         if (possibleMoves.length === 81) {
             return [4, 1, 1];
         }
-
-        possibleMoves.forEach(move => {
-            const newState = this.game.updateState(state, move);
-            const moveValue = this.minimax(newState, maxDepth, -Infinity, Infinity);
-            if (state.player === 1 && moveValue > bestValue) {
-                bestValue = moveValue;
-                bestMove = move;
-            }
-            if (state.player === -1 && moveValue < bestValue) {
-                bestValue = moveValue;
-                bestMove = move;
-            }
-            console.log({ move, bestValue, bestMove });
-        });
-        return bestMove;
+        const minimax = this.minimax(state, maxDepth, -Infinity, Infinity);
+        return minimax.bestMove;
     }
 }
