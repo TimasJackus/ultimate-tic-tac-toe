@@ -33,7 +33,6 @@ export class Minimax {
         const possibleMoves: number[][] = this.game.getPossibleMoves(state);
         let bestScore;
         let bestMove = possibleMoves[0];
-        if (depth === 3) console.log(possibleMoves);
 
         if (state.player === 1) {
             bestScore = -Infinity;
@@ -71,7 +70,7 @@ export class Minimax {
         return { bestScore, bestMove };
     }
 
-    findBestMove(state: State, maxDepth = 3): number[] {
+    findBestMove(state: State, maxDepth = 5): number[] {
         const possibleMoves: number[][] = this.game.getPossibleMoves(state);
         if (possibleMoves.length === 81) {
             return [4, 1, 1];
